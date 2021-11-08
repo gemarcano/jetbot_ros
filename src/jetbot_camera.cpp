@@ -49,6 +49,8 @@ bool aquireFrame()
 		ROS_ERROR("failed to capture camera frame");
 		return false;
 	}
+	timespec stamp{};
+	clock_gettime(CLOCK_REALTIME, &stamp);
 
 	// assure correct image size
 	if( !camera_cvt->Resize(camera->GetWidth(), camera->GetHeight(), IMAGE_RGBA32F) )
@@ -59,6 +61,8 @@ bool aquireFrame()
 
 	// populate the message
 	sensor_msgs::Image msg;
+	msg.header.stamp.sec = stamp.tv_sec;
+	msg.header.stamp.nsec = stamp.tv_nsec;
 
 	if( !camera_cvt->Convert(msg, imageConverter::ROSOutputFormat, imgRGBA) )
 	{
